@@ -783,10 +783,29 @@
         }
 
         document.getElementById('resetBtn').onclick = () => {
-            state[currentDay] = {};
+            state = {};
             saveState();
             render();
         };
+
+        // Week runs Sun–Thu, so a new cycle starts each Friday. Auto-reset
+        // checkmarks once when the app is opened in a new Fri–Thu period.
+        function currentWeekPeriodKey(now) {
+            const dow = now.getDay(); // 0 = Sun ... 6 = Sat
+            const daysSinceFriday = (dow - 5 + 7) % 7;
+            const periodStart = new Date(now);
+            periodStart.setDate(now.getDate() - daysSinceFriday);
+            return dateKey(periodStart);
+        }
+        function checkWeeklyAutoReset() {
+            const key = currentWeekPeriodKey(new Date());
+            const lastReset = localStorage.getItem('workoutPlanLastReset');
+            if (lastReset !== key) {
+                state = {};
+                saveState();
+                localStorage.setItem('workoutPlanLastReset', key);
+            }
+        }
 
         /* ---- Alcohol-free tracker ---- */
         const SOBER_START = new Date('2026-08-29T00:00:00');
@@ -897,6 +916,7 @@
         updateSoberCount();
 
         loadState();
+        checkWeeklyAutoReset();
         renderCountdown();
         render();
     </script>
