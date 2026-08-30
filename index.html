@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>12/12 Countdown — Home Dumbbell Plan</title>
+    <style>
+        :root {
+            --bg: #141414;
+            --card: #1e1e1e;
+            --card-hi: #242424;
+            --steel: #5b7c99;
+            --iron: #8a8a8a;
+            --plate: #ff6b35;
+            --plate-dim: #a84a25;
+            --text: #eee8e0;
+            --text-dim: #9a938a;
+            --line: #333;
+            --done: #3d9970;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .wrap {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 0 0 60px;
+        }
+
+        header {
+            padding: 28px 20px 20px;
+            border-bottom: 3px solid var(--plate);
+            background: linear-gradient(180deg, #1a1a1a 0%, var(--bg) 100%);
+        }
+
+        .eyebrow {
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: var(--plate);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-family: 'Arial Black', 'Segoe UI', sans-serif;
+            font-weight: 900;
+            font-size: 30px;
+            letter-spacing: -0.5px;
+            margin: 6px 0 4px;
+            text-transform: uppercase;
+        }
+
+        .sub {
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+
+        #countdown {
+            margin-top: 14px;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        #countdown .num {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 44px;
+            font-weight: 900;
+            color: var(--plate);
+            line-height: 1;
+        }
+
+        #countdown .lbl {
+            color: var(--text-dim);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .equip {
+            display: flex;
+            gap: 8px;
+            padding: 14px 20px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .plate-chip {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 12px;
+            color: var(--iron);
+            font-weight: 600;
+        }
+
+        nav {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--line);
+            border-bottom: 1px solid var(--line);
+        }
+
+        nav button {
+            background: var(--card);
+            color: var(--text-dim);
+            border: none;
+            padding: 12px 4px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background .15s, color .15s;
+        }
+
+        nav button .d {
+            display: block;
+            font-size: 15px;
+            font-weight: 900;
+            margin-bottom: 2px;
+            color: var(--text);
+        }
+
+        nav button.active {
+            background: var(--plate);
+            color: #141414;
+        }
+
+        nav button.active .d {
+            color: #141414;
+        }
+
+        nav button.complete:not(.active) {
+            color: var(--done);
+        }
+
+        nav button.complete:not(.active) .d {
+            color: var(--done);
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .day-header-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .day-title {
+            font-family: 'Arial Black', sans-serif;
+            font-weight: 900;
+            font-size: 22px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .day-focus {
+            color: var(--plate);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .ex {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-left: 4px solid var(--steel);
+            border-radius: 6px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            cursor: pointer;
+            transition: background .15s, border-color .15s;
+        }
+
+        .ex.done {
+            border-left-color: var(--done);
+            background: var(--card-hi);
+        }
+
+        .ex.done .ex-name {
+            color: var(--text-dim);
+            text-decoration: line-through;
+            text-decoration-color: var(--done);
+        }
+
+        .ex-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .checkbox {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid var(--steel);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: transparent;
+            transition: all .15s;
+        }
+
+        .ex.done .checkbox {
+            background: var(--done);
+            border-color: var(--done);
+            color: #141414;
+        }
+
+        .ex-name {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .ex-meta {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 2px;
+        }
+
+        .weight-tag {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--plate);
+            background: rgba(255, 107, 53, 0.12);
+            padding: 3px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .ex-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .video-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            color: #ff3b3b;
+            text-decoration: none;
+            white-space: nowrap;
+            border: 1.5px solid #ff3b3b;
+            padding: 4px 10px 4px 8px;
+            border-radius: 20px;
+            background: rgba(255, 59, 59, 0.08);
+            transition: background .15s, color .15s, transform .1s;
+        }
+
+        .video-link .play-ico {
+            font-size: 8px;
+            display: inline-flex;
+            width: 14px;
+            height: 14px;
+            align-items: center;
+            justify-content: center;
+            background: #ff3b3b;
+            color: #141414;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .video-link:active {
+            background: #ff3b3b;
+            color: #141414;
+            transform: scale(0.96);
+        }
+
+        .video-link:active .play-ico {
+            background: #141414;
+            color: #ff3b3b;
+        }
+
+        .cardio-block {
+            background: var(--card);
+            border: 1px solid var(--steel);
+            border-radius: 6px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--text-dim);
+        }
+
+        .cardio-block b {
+            color: var(--steel);
+        }
+
+        .progress-bar-wrap {
+            margin-top: 20px;
+            background: var(--card);
+            border-radius: 6px;
+            padding: 14px 16px;
+            border: 1px solid var(--line);
+        }
+
+        .progress-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: #111;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--plate-dim), var(--plate));
+            transition: width .3s;
+            width: 0%;
+        }
+
+        .reset-btn {
+            display: block;
+            margin: 24px auto 0;
+            background: none;
+            border: 1px solid var(--line);
+            color: var(--text-dim);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .reset-btn:active {
+            background: var(--card);
+        }
+
+        /* Sober tracker — tiny widget */
+        .sober-tracker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-top: 3px solid var(--done);
+            border-radius: 8px;
+            padding: 6px 12px;
+            cursor: pointer;
+            color: var(--text);
+            flex-shrink: 0;
+        }
+
+        .sober-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .sober-count {
+            font-family: 'Arial Black', sans-serif;
+            font-weight: 900;
+            font-size: 22px;
+            color: var(--done);
+            line-height: 1.1;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-card {
+            background: var(--bg);
+            width: 100%;
+            max-width: 640px;
+            max-height: 85vh;
+            border-radius: 16px 16px 0 0;
+            border: 1px solid var(--line);
+            border-bottom: none;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 20px;
+            border-bottom: 1px solid var(--line);
+            position: sticky;
+            top: 0;
+            background: var(--bg);
+            z-index: 2;
+        }
+
+        .modal-eyebrow {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: var(--done);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .modal-big-count {
+            font-family: 'Arial Black', sans-serif;
+            font-weight: 900;
+            font-size: 42px;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .modal-big-unit {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-dim);
+        }
+
+        .modal-sub {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 6px;
+        }
+
+        .modal-close {
+            background: var(--card);
+            border: 1px solid var(--line);
+            color: var(--text);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 14px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .modal-body {
+            padding: 14px 20px 0;
+        }
+
+        .cal-month {
+            margin-bottom: 22px;
+        }
+
+        .cal-month-label {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 15px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            color: var(--iron);
+        }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+
+        .cal-dow {
+            text-align: center;
+            font-size: 10px;
+            color: var(--text-dim);
+            font-weight: 700;
+            padding-bottom: 2px;
+        }
+
+        .cal-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            background: var(--card);
+            border: 1px solid var(--line);
+            color: var(--text-dim);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cal-day.empty {
+            background: transparent;
+            border: none;
+            cursor: default;
+        }
+
+        .cal-day.future-disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .cal-day.checked {
+            background: var(--done);
+            border-color: var(--done);
+            color: #141414;
+        }
+
+        .cal-day.today {
+            border-color: var(--plate);
+            color: var(--plate);
+        }
+
+        .cal-day.checked.today {
+            color: #141414;
+        }
+
+        .tip {
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--text-dim);
+            border-top: 1px dashed var(--line);
+            padding-top: 14px;
+            line-height: 1.5;
+        }
+
+        .tip b {
+            color: var(--iron);
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+
+        <header>
+            <div class="eyebrow">Home Program &middot; Dumbbells Only</div>
+            <h1>Countdown to Dec 12</h1>
+            <div class="sub">10 / 15 / 20 lb dumbbells + bench</div>
+            <div id="countdown">
+                <span class="num" id="days-left">--</span>
+                <span class="lbl">days out</span>
+            </div>
+        </header>
+
+        <div class="equip">
+            <span class="plate-chip">🏋️ 10 lb</span>
+            <span class="plate-chip">🏋️ 15 lb</span>
+            <span class="plate-chip">🏋️ 20 lb</span>
+            <span class="plate-chip">🪑 Flat Bench</span>
+        </div>
+
+        <nav id="dayNav"></nav>
+
+        <main>
+            <div class="day-header-row">
+                <div>
+                    <div class="day-title" id="dayTitle"></div>
+                    <div class="day-focus" id="dayFocus"></div>
+                </div>
+                <button class="sober-tracker" id="soberTrackerBtn">
+                    <span class="sober-label">🚫 No-Drink</span>
+                    <span class="sober-count" id="soberCount">0</span>
+                </button>
+            </div>
+            <div id="exerciseList"></div>
+
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-label"><span>Week progress</span><span id="progressPct">0%</span></div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="tip" id="dayTip"></div>
+
+            <button class="reset-btn" id="resetBtn">Reset this week's checkmarks</button>
+        </main>
+
+    </div>
+
+    <div class="modal-overlay" id="soberModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-eyebrow">Alcohol-Free Streak</div>
+                    <div class="modal-big-count"><span id="modalCount">0</span> <span class="modal-big-unit">days</span></div>
+                    <div class="modal-sub">Aug 29 &mdash; Dec 12, 2026</div>
+                </div>
+                <button class="modal-close" id="soberModalClose">✕</button>
+            </div>
+            <div class="modal-body" id="soberCalendar"></div>
+        </div>
+    </div>
+
+    <script>
+        const TARGET_DATE = new Date('2026-12-12T00:00:00');
+
+        const plan = [
+            {
+                key: 'day1', short: 'Sun', title: 'Day 1', focus: 'Upper Body A',
+                tip: 'Push-focused day. Rest 60–90 sec between sets on bench and shoulder press so you can push weight.',
+                items: [
+                    { name: 'Dumbbell Bench Press', meta: '4 sets × 10 reps', weight: '20 lb', video: 'xhEhjF5ozuY' },
+                    { name: 'Dumbbell Shoulder Press', meta: '3 sets × 10 reps', weight: '15 lb', video: 'GFblCmuEE18' },
+                    { name: 'Overhead Tricep Extension', meta: '3 sets × 12 reps', weight: '10–15 lb', video: 'fYqswDVbJDg' },
+                    { name: 'Plank', meta: '3 sets × 45 sec', weight: 'bodyweight', video: 'A2b2EmIg0dA' },
+                ]
+            },
+            {
+                key: 'day2', short: 'Mon', title: 'Day 2', focus: 'Lower Body A',
+                tip: 'Keep your back flat on the RDLs and don\'t rush the eccentric (lowering) portion — that\'s where hamstrings do the most work.',
+                items: [
+                    { name: 'Goblet Squats', meta: '4 sets × 12 reps', weight: '20 lb', video: 'BR4tlEE_A98' },
+                    { name: 'Romanian Deadlifts', meta: '3 sets × 10 reps', weight: '20 lb', video: 'aa57T45iFSE' },
+                    { name: 'Bulgarian Split Squats', meta: '3 sets × 10 reps/leg', weight: '15 lb', video: 'hiLF_pF3EJM' },
+                    { name: 'Lying Leg Raises', meta: '3 sets × 12 reps', weight: 'bodyweight', video: '0tzBVqiDwSs' },
+                ]
+            },
+            {
+                key: 'day3', short: 'Wed', title: 'Day 3', focus: 'Upper Body B',
+                tip: 'Pull-focused day. Single-arm rows: brace your free hand on the bench, flat back, pull elbow to hip — not straight up.',
+                items: [
+                    { name: 'Single-Arm Dumbbell Rows', meta: '4 sets × 10 reps/side', weight: '20 lb', video: 'fURsHPHgssI' },
+                    { name: 'Rear Delt Flyes', meta: '3 sets × 12 reps', weight: '10 lb', video: 'hwBu73GZn98' },
+                    { name: 'Bicep Curls', meta: '3 sets × 12 reps', weight: '15 lb', video: 'XE_pHwbst04' },
+                    { name: 'Bicycle Crunches', meta: '3 sets × 20 reps', weight: 'bodyweight', video: 'PAEo-zRSanM' },
+                ]
+            },
+            {
+                key: 'day4', short: 'Thu', title: 'Day 4', focus: 'Lower Body B + HIIT',
+                tip: 'Circuit format: no rest between exercises, 60–90 sec rest between rounds. Follow it with the HIIT block to finish the week strong.',
+                items: [
+                    { name: 'Circuit: DB Swings ×12', meta: '3 rounds', weight: '15 lb', video: 'Y30kFfgW-bY' },
+                    { name: 'Circuit: Step-Ups ×12', meta: '3 rounds', weight: '15 lb', video: 'aKj-6hgiViA' },
+                    { name: 'Circuit: Push-Ups ×12', meta: '3 rounds', weight: 'bodyweight', video: 'WDIpL0pjun0' },
+                    { name: 'Russian Twists', meta: '3 sets × 20 reps/side', weight: '10 lb', video: '9V9csctSKj0' },
+                ],
+                cardio: '15 min HIIT — bodyweight burpees, mountain climbers, jump squats (30 sec on / 30 sec off)'
+            },
+        ];
+
+        let currentDay = plan[0].key;
+        let state = {};
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem('workoutPlanState');
+                state = raw ? JSON.parse(raw) : {};
+            } catch (e) { state = {}; }
+        }
+        function saveState() {
+            try { localStorage.setItem('workoutPlanState', JSON.stringify(state)); }
+            catch (e) { /* localStorage unavailable, state stays in-memory for this session */ }
+        }
+
+        function dayCompleteCount(day) {
+            const d = plan.find(p => p.key === day);
+            const s = state[day] || {};
+            let done = 0;
+            d.items.forEach((_, i) => { if (s[i]) done++; });
+            return { done, total: d.items.length };
+        }
+
+        function weekCompleteCount() {
+            let done = 0, total = 0;
+            plan.forEach(d => {
+                const { done: dd, total: dt } = dayCompleteCount(d.key);
+                done += dd; total += dt;
+            });
+            return { done, total };
+        }
+
+        function renderNav() {
+            const nav = document.getElementById('dayNav');
+            nav.innerHTML = '';
+            plan.forEach(d => {
+                const btn = document.createElement('button');
+                const { done, total } = dayCompleteCount(d.key);
+                btn.className = (d.key === currentDay ? 'active ' : '') + (done === total ? 'complete' : '');
+                btn.innerHTML = `<span class="d">${d.short}</span>${d.focus.split(' ')[0]}`;
+                btn.onclick = () => { currentDay = d.key; render(); };
+                nav.appendChild(btn);
+            });
+        }
+
+        const DOW_FULL = { Sun: 'Sunday', Mon: 'Monday', Tue: 'Tuesday', Wed: 'Wednesday', Thu: 'Thursday', Fri: 'Friday', Sat: 'Saturday' };
+
+        function renderDay() {
+            const d = plan.find(p => p.key === currentDay);
+            document.getElementById('dayTitle').textContent = d.title + ' — ' + (DOW_FULL[d.short] || d.short);
+            document.getElementById('dayFocus').textContent = d.focus;
+            document.getElementById('dayTip').innerHTML = '<b>Tip:</b> ' + d.tip;
+
+            const list = document.getElementById('exerciseList');
+            list.innerHTML = '';
+
+            if (d.cardio) {
+                const cb = document.createElement('div');
+                cb.className = 'cardio-block';
+                cb.innerHTML = '<b>Cardio:</b> ' + d.cardio;
+                list.appendChild(cb);
+            }
+
+            const s = state[currentDay] || {};
+            d.items.forEach((item, i) => {
+                const row = document.createElement('div');
+                row.className = 'ex' + (s[i] ? ' done' : '');
+                row.innerHTML = `
+      <div class="ex-left">
+        <div class="checkbox">✓</div>
+        <div>
+          <div class="ex-name">${item.name}</div>
+          <div class="ex-meta">${item.meta}</div>
+        </div>
+      </div>
+      <div class="ex-right">
+        <div class="weight-tag">${item.weight}</div>
+        <a class="video-link" target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=${item.video}" onclick="event.stopPropagation()"><span class="play-ico">▶</span>Watch</a>
+      </div>
+    `;
+                row.onclick = () => {
+                    if (!state[currentDay]) state[currentDay] = {};
+                    state[currentDay][i] = !state[currentDay][i];
+                    saveState();
+                    render();
+                };
+                list.appendChild(row);
+            });
+
+            const { done, total } = weekCompleteCount();
+            const pct = total ? Math.round(done / total * 100) : 0;
+            document.getElementById('progressFill').style.width = pct + '%';
+            document.getElementById('progressPct').textContent = pct + '%';
+        }
+
+        function renderCountdown() {
+            const now = new Date();
+            const diff = Math.ceil((TARGET_DATE - now) / (1000 * 60 * 60 * 24));
+            document.getElementById('days-left').textContent = diff > 0 ? diff : 0;
+        }
+
+        function render() {
+            renderNav();
+            renderDay();
+        }
+
+        document.getElementById('resetBtn').onclick = () => {
+            state[currentDay] = {};
+            saveState();
+            render();
+        };
+
+        /* ---- Alcohol-free tracker ---- */
+        const SOBER_START = new Date('2026-08-29T00:00:00');
+        const SOBER_END = new Date('2026-12-12T00:00:00');
+        let soberState = {};
+
+        function loadSoberState() {
+            try {
+                const raw = localStorage.getItem('soberTrackerState');
+                soberState = raw ? JSON.parse(raw) : {};
+            } catch (e) { soberState = {}; }
+        }
+        function saveSoberState() {
+            try { localStorage.setItem('soberTrackerState', JSON.stringify(soberState)); }
+            catch (e) { /* localStorage unavailable, state stays in-memory for this session */ }
+        }
+        function dateKey(d) {
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        }
+        function soberTotal() {
+            return Object.values(soberState).filter(Boolean).length;
+        }
+        function updateSoberCount() {
+            const total = soberTotal();
+            document.getElementById('soberCount').textContent = total;
+            document.getElementById('modalCount').textContent = total;
+        }
+
+        const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        const DOW = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+        function renderSoberCalendar() {
+            const cal = document.getElementById('soberCalendar');
+            cal.innerHTML = '';
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            let cursor = new Date(SOBER_START.getFullYear(), SOBER_START.getMonth(), 1);
+            const lastMonth = new Date(SOBER_END.getFullYear(), SOBER_END.getMonth(), 1);
+
+            while (cursor <= lastMonth) {
+                const monthDiv = document.createElement('div');
+                monthDiv.className = 'cal-month';
+                const label = document.createElement('div');
+                label.className = 'cal-month-label';
+                label.textContent = MONTH_NAMES[cursor.getMonth()] + ' ' + cursor.getFullYear();
+                monthDiv.appendChild(label);
+
+                const grid = document.createElement('div');
+                grid.className = 'cal-grid';
+                DOW.forEach(d => {
+                    const dow = document.createElement('div');
+                    dow.className = 'cal-dow';
+                    dow.textContent = d;
+                    grid.appendChild(dow);
+                });
+
+                const firstOfMonth = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
+                const startPad = firstOfMonth.getDay();
+                for (let i = 0; i < startPad; i++) {
+                    const empty = document.createElement('div');
+                    empty.className = 'cal-day empty';
+                    grid.appendChild(empty);
+                }
+
+                const daysInMonth = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0).getDate();
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const d = new Date(cursor.getFullYear(), cursor.getMonth(), day);
+                    if (d < SOBER_START || d > SOBER_END) continue;
+                    const key = dateKey(d);
+                    const cell = document.createElement('div');
+                    cell.className = 'cal-day';
+                    if (soberState[key]) cell.className += ' checked';
+                    if (d.getTime() === today.getTime()) cell.className += ' today';
+                    if (d > today) cell.className += ' future-disabled';
+                    cell.textContent = day;
+                    if (d <= today) {
+                        cell.onclick = () => {
+                            soberState[key] = !soberState[key];
+                            saveSoberState();
+                            updateSoberCount();
+                            renderSoberCalendar();
+                        };
+                    }
+                    grid.appendChild(cell);
+                }
+
+                monthDiv.appendChild(grid);
+                cal.appendChild(monthDiv);
+                cursor = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
+            }
+        }
+
+        function openSoberModal() {
+            renderSoberCalendar();
+            document.getElementById('soberModal').classList.add('open');
+        }
+        function closeSoberModal() {
+            document.getElementById('soberModal').classList.remove('open');
+        }
+        document.getElementById('soberTrackerBtn').onclick = openSoberModal;
+        document.getElementById('soberModalClose').onclick = closeSoberModal;
+        document.getElementById('soberModal').onclick = (e) => {
+            if (e.target.id === 'soberModal') closeSoberModal();
+        };
+
+        loadSoberState();
+        updateSoberCount();
+
+        loadState();
+        renderCountdown();
+        render();
+    </script>
+</body>
+
+</html>
